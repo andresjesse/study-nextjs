@@ -1,10 +1,14 @@
+import { Post } from "@prisma/client";
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { prismaClient } from "../lib/prismaClient";
 import styles from "../styles/Home.module.css";
 
-const Home: NextPage = () => {
+interface HomeProps {
+  posts: Post[];
+}
+
+const Home: NextPage<HomeProps> = ({ posts }) => {
   return (
     <div className={styles.container}>
       <Head>
@@ -14,14 +18,26 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>Hello Next</h1>
-        <div>New Content</div>
-        <div>Another one</div>
+        {posts.map((post: Post) => (
+          <div>
+            {post.id} - {post.title}
+          </div>
+        ))}
       </main>
 
       <footer className={styles.footer}></footer>
     </div>
   );
+};
+
+export const getStaticProps = async ({}) => {
+  const posts = await prismaClient.post.findMany();
+
+  return {
+    props: {
+      posts,
+    },
+  };
 };
 
 export default Home;
